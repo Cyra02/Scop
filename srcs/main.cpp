@@ -99,6 +99,8 @@ int main()
     //guAarda la descripcion y como leer el VBO -> cuantos vertices tiene que tipo cuanto ocupa cada vertice offset donde empieza  y que VBO leer
     // a ver si me estero
 
+
+    
     GLuint vbo, vao;
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
@@ -141,6 +143,17 @@ int main()
         glUseProgram(program);
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
+        //para error del dibujado
+        GLint bien;
+        glGetProgramiv(program, GL_LINK_STATUS, &bien);
+        if (!bien)
+        {
+            char log[512];
+            glGetProgramInfoLog(program, 512, NULL, log);
+            std::cerr << "Error enlazando el programa:\n" << log << std::endl;
+        }
+
+
 
         glfwSwapBuffers(win);
         glfwPollEvents();
