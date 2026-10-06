@@ -10,6 +10,8 @@ struct Mat4
     static Mat4 translate(float tx, float ty, float tz);
     Mat4 operator*(const Mat4 &o) const;
     static Mat4 rotateY(float angle);
+    static Mat4 rotateX(float angle);
+    static Mat4 rotateZ(float angle);
 };
 
 #endif

@@ -145,7 +145,8 @@ int main()
 
         //rotar
         float angle = (float)glfwGetTime();
-        Mat4 model = Mat4::rotateY(angle);
+        // el orden importa el 0.5 es el angulo en el que crece si es negativo irapara el otro lado jeje
+        Mat4 model = Mat4::rotateY(angle) * Mat4::rotateX(angle * 0.5f);
 
         GLint loc = glGetUniformLocation(program, "uModel");
         glUniformMatrix4fv(loc, 1, GL_FALSE, model.m);

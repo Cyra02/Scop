@@ -61,3 +61,31 @@ Mat4 Mat4::rotateY(float angle)
 
     return r;
 }
+
+Mat4 Mat4::rotateX(float angle)
+{
+    Mat4 r = Mat4::identity();
+    float c = std::cos(angle);
+    float s = std::sin(angle);
+
+    r.m[5] =c;
+    r.m[6] = s;
+    r.m[9] = -s;
+    r.m[10] = c;
+
+    return r;
+}
+
+Mat4 Mat4::rotateZ(float angle)
+{
+    Mat4 r = Mat4::identity();
+    float c = std::cos(angle);
+    float s = std::sin(angle);
+
+    r.m[0] =c;
+    r.m[1] = s;
+    r.m[4] = -s;
+    r.m[5] = c;
+
+    return r;
+}
