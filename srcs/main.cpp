@@ -2,6 +2,7 @@
 #define GLFW_INCLUDE_GLEXT
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3.h>
+#include "../includes/Mat4.hpp"
 #include <iostream>
 #include <fstream> // para leer archivos
 #include <sstream> // volcartexto
@@ -141,6 +142,14 @@ int main()
 
         // dibujar
         glUseProgram(program);
+
+        //rotar
+        float angle = (float)glfwGetTime();
+        Mat4 model = Mat4::rotateY(angle);
+
+        GLint loc = glGetUniformLocation(program, "uModel");
+        glUniformMatrix4fv(loc, 1, GL_FALSE, model.m);
+
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         //para error del dibujado
