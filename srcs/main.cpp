@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include "../includes/Mat4.hpp"
 #include "../includes/ObjLoad.hpp"
+#include "../includes/Input.hpp"
 #include <iostream>
 #include <fstream> // para leer archivos
 #include <sstream> // volcartexto
@@ -97,7 +98,7 @@ int main()
     std::vector<Vec3> objVertices;
     std::vector<unsigned int> objIndices;
 
-    if(!objLoad("resources/42.obj", objVertices, objIndices))
+    if(!objLoad("resources/Flower.obj", objVertices, objIndices))
         return 1;
     
     std::cout << "vertices leidos: " << objVertices.size() << std::endl;
@@ -170,16 +171,14 @@ int main()
    Vec3 centre = Vec3::centro(objVertices);
    std::cout << "centro: " << centre.x << " " << centre.y << " " << centre.z << std::endl;
 
-
+    Transform t = {0.0f, ToRadians(-90), 0.0f, 0.0f, -8.0f}; // rotado porque viene de lado el 42
+    float lastTime =(float)glfwGetTime();
 
     while(!glfwWindowShouldClose(win))
     {
         //bueno saber que hay inputs manuales esto es para que se cierree
         // si pulsas el escape
-        if(glfwGetKey(win, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        {
-            glfwSetWindowShouldClose(win, GLFW_TRUE);
-        }
+        
 
         glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -188,10 +187,13 @@ int main()
         glUseProgram(program);
 
         //rotar
-        float angle = (float)glfwGetTime();
+        float now = (float)glfwGetTime();
+        float dt = now -lastTime;
+        lastTime = now;
+        input(win, t, dt);
         
         // el orden importa el 0.5 es el angulo en el que crece si es negativo irapara el otro lado jeje
-        Mat4 model =  Mat4::translate(0.0f, 0.0f, -8.0f)  * Mat4::rotateY(angle) * Mat4::translate(-centre.x, -centre.y, -centre.z) ;
+        Mat4 model =  Mat4::translate(t.posX, t.posY, t.posZ)  * Mat4::rotateY(t.rotY) * Mat4::rotateX(t.rotX)* Mat4::translate(-centre.x, -centre.y, -centre.z) ;
         
 
         Mat4 proj = Mat4::perspectiva(ToRadians(50.0f), 800.0f / 600.0f, 0.1f , 100.0f );
