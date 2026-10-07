@@ -6,9 +6,10 @@ layout(location = 1) in vec3 aColor;
 
 out vec3 vColor;
 uniform mat4 uModel;
+uniform mat4 uProjection;
 
 void main()
 {
     vColor = aColor;
-    gl_Position =  uModel * vec4(aPos, 1.0);
+    gl_Position =  uProjection * uModel * vec4(aPos, 1.0);
 }

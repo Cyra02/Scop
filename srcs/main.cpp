@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3.h>
 #include "../includes/Mat4.hpp"
+#include "../includes/ObjLoad.hpp"
 #include <iostream>
 #include <fstream> // para leer archivos
 #include <sstream> // volcartexto
@@ -17,6 +18,11 @@ static std::string readFile(const std::string &path)
     return buffer.str();
 }
 
+static float ToRadians(float grados)
+{
+    return grados * 3.14159f / 180.0f;
+
+}
 
 static GLuint compileShader(GLenum type, const std::string &path)
 {
@@ -127,6 +133,17 @@ int main()
 
     //std::cout << readFile("shaders/basic.vert") << std::endl;
 
+    // cargar objeto
+    std::vector<Vec3> objVertices;
+    std::vector<unsigned int> objIndices;
+
+    if(!ObjLoad("resources/42.obj", objVertices, objIndices))
+        return 1;
+    
+    std::cout << "vertices leidos: " << objVertices.size() << std::endl;
+    std::cout << "primero: " << objVertices[0].x << " " << objVertices[0].y << " " << objVertices[0].z << std::endl;
+    std::cout << "vertices: " << objVertices.size() << "triangulos: " << objIndices.size() / 3 << std::endl; 
+
 
     while(!glfwWindowShouldClose(win))
     {
@@ -146,7 +163,14 @@ int main()
         //rotar
         float angle = (float)glfwGetTime();
         // el orden importa el 0.5 es el angulo en el que crece si es negativo irapara el otro lado jeje
-        Mat4 model = Mat4::rotateY(angle) * Mat4::rotateX(angle * 0.5f);
+        Mat4 model =  Mat4::translate(0.0f, 0.0f, -3.0f) * Mat4::rotateY(angle) * Mat4::rotateX(angle) ;
+        
+
+        Mat4 proj = Mat4::perspectiva(ToRadians(50.0f), 800.0f / 600.0f, 0.1f , 100.0f );
+        GLint locP = glGetUniformLocation(program, "uProjection");
+
+     
+        glUniformMatrix4fv(locP, 1, GL_FALSE, proj.m);
 
         GLint loc = glGetUniformLocation(program, "uModel");
         glUniformMatrix4fv(loc, 1, GL_FALSE, model.m);

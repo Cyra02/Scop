@@ -39,7 +39,7 @@ Mat4 Mat4::operator*(const Mat4 &o) const
         {
             float sum = 0;
             for(int k =0; k < 4; k++)
-                sum += m[k * 4 + f] * o.m[ c * 4 + f];
+                sum += m[k * 4 + f] * o.m[ c * 4 + k];
             r.m[c * 4 + f] = sum;
         }
     }
@@ -88,4 +88,25 @@ Mat4 Mat4::rotateZ(float angle)
     r.m[5] = c;
 
     return r;
+}
+// fov controla el zoom, aspect el ancho alto de la ventana y near y far distancias maxima y minima que se dibujan
+//cuadado si cambias el tamaño de la ventana
+// Mat4 proj = Mat4::perspectiva(ToRadians(50.0f), 800.0f / 600.0f, 0.1f , 100.0f );
+Mat4 Mat4::perspectiva(float fov, float aspect, float near, float far)
+{
+
+    Mat4 r;
+    for(int i = 0; i < 16; i++)
+        r.m[i] = 0.0f;
+
+    float f = 1.0f / std::tan(fov/ 2.0f);
+
+    r.m[0] = f / aspect;
+    r.m[5] = f;
+    r.m[10] = (far + near) / (near - far);
+    r.m[11] = -1.0f;
+    r.m[14] = (2.0f * far * near) / (near - far);
+
+    return r;
+
 }

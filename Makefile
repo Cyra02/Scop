@@ -3,7 +3,7 @@ CXX      = g++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++17 -Iincludes
 LDFLAGS  = $(shell pkg-config --libs glfw3) -lGL -ldl
 
-SRCS     = srcs/main.cpp srcs/Mat4.cpp
+SRCS     = srcs/main.cpp srcs/Mat4.cpp srcs/ObjLoad.cpp
 OBJS     = $(SRCS:srcs/%.cpp=obj/%.o)
 
 all: deps $(NAME)
