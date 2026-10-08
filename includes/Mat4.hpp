@@ -14,6 +14,7 @@ struct Mat4
     static Mat4 rotateZ(float angle);
 
     static Mat4 perspectiva(float fov, float aspect, float near, float far);
+    static Mat4 scale(float sx, float sy, float sz);
 };
 
 #endif

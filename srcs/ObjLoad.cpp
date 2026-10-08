@@ -81,3 +81,67 @@ Vec3 Vec3::centro(const std::vector<Vec3> &vertices)
                 (mn.y + mx.y)/ 2.0f,
                 (mn.z + mx.z)/ 2.0f,};
 }
+
+std::vector<float> faceData(const std::vector<Vec3> &vertices, const std::vector<unsigned int> &indices)
+{
+    std::vector<float> data;
+    data.reserve(indices.size() * 6);
+
+    for(size_t tri = 0; tri < indices.size() / 3; tri++)
+    {
+        float gray = 0.3f + 0.4f * (float)((tri * 37) % 10) / 10.0f; // mas variacon de grises 
+
+        for(int k = 0; k < 3; k++)
+        {
+            const Vec3 &v = vertices[indices[tri * 3 + k]];
+            data.push_back(v.x);
+            data.push_back(v.y);
+            data.push_back(v.z);
+            data.push_back(gray);
+            data.push_back(gray);
+            data.push_back(gray);
+
+            
+        }
+    }
+    return data;
+}
+
+float maxExtent(const std::vector<Vec3> &vertices)
+{
+    if(vertices.empty())
+        return 1.0f;
+    
+    Vec3 mn = vertices[0];
+    Vec3 mx = vertices[0];
+
+    for(size_t i = 1; i < vertices.size(); i++)
+    {
+        if(vertices[i].x < mn.x)
+            mn.x = vertices[i].x;
+        if(vertices[i].y < mn.y)
+            mn.y = vertices[i].y;
+        if(vertices[i].z < mn.z)
+            mn.z = vertices[i].z;
+
+        if(vertices[i].x > mx.x)
+            mx.x = vertices[i].x;
+        if(vertices[i].y > mx.y)
+            mx.y = vertices[i].y;
+        if(vertices[i].z > mx.z)
+            mx.z = vertices[i].z;
+    }
+
+    float ex = mx.x - mn.x;
+    float ey = mx.y - mn.y;
+    float ez = mx.z - mn.z;
+
+    float m = ex;
+    if(ey > m) 
+        m = ey;
+    if(ez > m)
+        m = ez;
+
+    return(m > 0.0f) ? m : 1.0f;
+    
+}

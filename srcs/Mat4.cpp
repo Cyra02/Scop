@@ -110,3 +110,13 @@ Mat4 Mat4::perspectiva(float fov, float aspect, float near, float far)
     return r;
 
 }
+
+Mat4 Mat4::scale(float sx, float sy, float sz)
+{
+    Mat4 r = Mat4::identity();
+
+    r.m[0] = sx;
+    r.m[5] = sy;
+    r.m[10] = sz;
+    return r;
+}
