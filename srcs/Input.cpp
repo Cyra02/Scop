@@ -20,6 +20,11 @@ void input(GLFWwindow *win, Transform &t, float dt, int texCount)
     if(glfwGetKey(win, GLFW_KEY_S) == GLFW_PRESS)
         t.rotX += rotspeed *dt;
 
+    if(glfwGetKey(win, GLFW_KEY_Z) == GLFW_PRESS)
+        t.rotZ -= rotspeed *dt;
+    if(glfwGetKey(win, GLFW_KEY_X) == GLFW_PRESS)
+        t.rotZ += rotspeed *dt;
+
 
     if(glfwGetKey(win, GLFW_KEY_LEFT) == GLFW_PRESS)
         t.posX -= movespeed *dt;

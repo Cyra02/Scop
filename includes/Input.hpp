@@ -7,6 +7,7 @@ struct Transform
 {
     float rotX;
     float rotY;
+    float rotZ;
     float posX;
     float posY;
     float posZ;
