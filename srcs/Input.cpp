@@ -1,6 +1,6 @@
 #include "../includes/Input.hpp"
 
-void input(GLFWwindow *win, Transform &t, float dt)
+void input(GLFWwindow *win, Transform &t, float dt, int texCount)
 {
     const float rotspeed = 1.5f;
     const float movespeed = 3.0f;
@@ -33,4 +33,14 @@ void input(GLFWwindow *win, Transform &t, float dt)
         t.posZ -= movespeed *dt;
     if(glfwGetKey(win, GLFW_KEY_E) == GLFW_PRESS)
         t.posZ += movespeed *dt;
+
+    bool tDown = (glfwGetKey(win, GLFW_KEY_T) == GLFW_PRESS);
+    if(tDown && !t.tDown)
+        t.useTexture = !t.useTexture;
+    t.tDown = tDown;
+
+    bool nDown = (glfwGetKey(win, GLFW_KEY_N) == GLFW_PRESS);
+    if(nDown && !t.nDown && texCount > 0)
+        t.texIndex = (t.texIndex + 1) %texCount; // para dar la vuelta al llegar al final
+    t.nDown = nDown;
 }

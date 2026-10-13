@@ -5,6 +5,7 @@
 #include "../includes/Mat4.hpp"
 #include "../includes/ObjLoad.hpp"
 #include "../includes/Input.hpp"
+#include "../includes/Texture.hpp"
 #include <iostream>
 #include <fstream> // para leer archivos
 #include <sstream> // volcartexto
@@ -98,9 +99,29 @@ int main()
     std::vector<Vec3> objVertices;
     std::vector<unsigned int> objIndices;
 
-    if(!objLoad("resources/teapot2.obj", objVertices, objIndices))
+    if(!objLoad("resources/42.obj", objVertices, objIndices))
         return 1;
     
+    // control de textura
+    std::vector<std::string> file;
+    file.push_back("resources/gatos.ppm");
+    file.push_back("resources/tex1.ppm");
+    file.push_back("resources/tex2.ppm");
+
+    std::vector<GLuint> textures;
+    for(size_t i = 0; i <file.size(); i++)
+    {
+        Texture tex;
+        if(!loadPPM(file[i], tex))
+            return 1;
+        std::cout << "Textura: " << tex.width << "x" << tex.height << " bytes " << tex.pixeles.size() << std::endl;
+        textures.push_back(createTextura(tex));
+
+    }
+    
+   
+   
+
     std::cout << "vertices leidos: " << objVertices.size() << std::endl;
     std::cout << "primero: " << objVertices[0].x << " " << objVertices[0].y << " " << objVertices[0].z << std::endl;
     std::cout << "vertices: " << objVertices.size() << "triangulos: " << objIndices.size() / 3 << std::endl; 
@@ -108,7 +129,7 @@ int main()
     //dibujar grises
     std::vector<float> data = faceData(objVertices, objIndices);
     std::cout << "floats en data " << data.size() << std::endl;
-    GLsizei vertexCount = (GLsizei) (data.size()/6);
+    GLsizei vertexCount = (GLsizei) (data.size()/8);
 
     //triangulo
     /* float vertices[] = 
@@ -142,29 +163,38 @@ int main()
     //6 * sizeog(float) porque cada vertice ocupa 6
     //offset suma de los atributos anteriores de 0-24 de 4 4n 4
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3* sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3* sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    //otra mierda mas el EBO
-    // a ver que esto lo tenia mal y no entiendo muy bien porque osea no es sizeof(float) sino unisgned int no solo por que los indices
-    // no puedan ser negativos sino qeu tambien es por como lo lee del tipo de cada vector
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, objIndices.size() * sizeof(unsigned int), objIndices.data(), GL_STATIC_DRAW); 
+    //de textura
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6* sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    
 
 
     //std::cout << readFile("shaders/basic.vert") << std::endl;
 
-   //centrarlo
-   Vec3 centre = Vec3::centro(objVertices);
-   std::cout << "centro: " << centre.x << " " << centre.y << " " << centre.z << std::endl;
+    //centrarlo
+    Vec3 centre = Vec3::centro(objVertices);
+    std::cout << "centro: " << centre.x << " " << centre.y << " " << centre.z << std::endl;
 
-    Transform t = {0.0f, ToRadians(-90), 0.0f, 0.0f, -8.0f}; // rotado porque viene de lado el 42
+    Transform t = {};
+    t.rotY = ToRadians(-90.0f);
+    t.posZ = -8.0f;
+    // rotado porque viene de lado el 42
     float lastTime =(float)glfwGetTime();
+    float mixValue = 0.0f;
 
     std::cout << "maxExtent: " << maxExtent(objVertices) << std::endl;
     float s = 4.0f / maxExtent(objVertices);
+
+    std::cout << "floats: " << data.size()
+          << " vertexCount: " << vertexCount
+          << " error GL: " << glGetError() << std::endl;
 
     while(!glfwWindowShouldClose(win))
     {
@@ -178,11 +208,21 @@ int main()
         // dibujar
         glUseProgram(program);
 
+        
+
+
         //rotar
         float now = (float)glfwGetTime();
         float dt = now -lastTime;
         lastTime = now;
-        input(win, t, dt);
+
+        //textura
+        input(win, t, dt, (int)textures.size());
+        mixValue = updateTextura(mixValue, t.useTexture, dt);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textures[t.texIndex]);
+        glUniform1i(glGetUniformLocation(program, "uTexture"), 0);
+        glUniform1f(glGetUniformLocation(program, "uMix"),mixValue);
         
         // el orden importa el 0.5 es el angulo en el que crece si es negativo irapara el otro lado jeje
         Mat4 model =  Mat4::translate(t.posX, t.posY, t.posZ) * Mat4::rotateX(t.rotX) * Mat4::rotateY(t.rotY)  * Mat4::scale(s,s,s) * Mat4::translate(-centre.x, -centre.y, -centre.z) ;
@@ -220,6 +260,8 @@ int main()
     //limpiamos
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
+
+    glDeleteTextures((GLsizei)textures.size(), textures.data());
 
     glDeleteProgram(program);
 

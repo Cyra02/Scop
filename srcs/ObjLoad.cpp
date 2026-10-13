@@ -85,7 +85,57 @@ Vec3 Vec3::centro(const std::vector<Vec3> &vertices)
 std::vector<float> faceData(const std::vector<Vec3> &vertices, const std::vector<unsigned int> &indices)
 {
     std::vector<float> data;
-    data.reserve(indices.size() * 6);
+    data.reserve(indices.size() * 8);
+
+    Vec3 mn = vertices[0];
+    Vec3 mx = vertices[0];
+
+    for(size_t i = 1; i < vertices.size(); i++)
+    {
+        if(vertices[i].x < mn.x) 
+            mn.x = vertices[i].x;
+        if(vertices[i].y < mn.y) 
+            mn.y = vertices[i].y;
+        if(vertices[i].z < mn.z) 
+            mn.z = vertices[i].z;
+        if(vertices[i].x > mx.x) 
+            mx.x = vertices[i].x;
+        if(vertices[i].y > mx.y) 
+            mx.y = vertices[i].y;
+        
+        if(vertices[i].z > mx.z) 
+            mx.z = vertices[i].z;
+
+        
+    }
+
+    float lo[3]  = {mn.x, mn.y, mn.z};
+    float ext[3] = {mx.x - mn.x, mx.y -mn.y, mx.z -mn.z };
+
+    for(int i = 0 ; i < 3; i++)
+        if(ext[i]<= 0.0f)
+            ext[i] = 1.0f;
+
+    int thin = 0;
+    if(ext[1] < ext[thin])
+        thin = 1;
+    if(ext[2] < ext[thin])
+        thin = 2;
+    
+    int uAxis, vAxis;
+    if(thin == 0)
+    {
+        uAxis = 2;
+        vAxis = 1;
+    }else if(thin == 1)
+    {
+        uAxis = 0;
+        vAxis = 2;
+    }else
+    {
+        uAxis = 0;
+        vAxis = 1;
+    }
 
     for(size_t tri = 0; tri < indices.size() / 3; tri++)
     {
@@ -100,6 +150,9 @@ std::vector<float> faceData(const std::vector<Vec3> &vertices, const std::vector
             data.push_back(gray);
             data.push_back(gray);
             data.push_back(gray);
+            float p[3] = {v.x, v.y, v.z};
+            data.push_back((p[uAxis] - lo[uAxis]) / ext[uAxis]);
+            data.push_back(1.0f - (p[vAxis] - lo[vAxis]) / ext[vAxis]);
 
             
         }

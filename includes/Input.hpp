@@ -10,8 +10,13 @@ struct Transform
     float posX;
     float posY;
     float posZ;
+
+    bool useTexture;
+    bool tDown;
+    int texIndex;
+    bool nDown;
 };
 
-void input(GLFWwindow *win, Transform &t, float dt);
+void input(GLFWwindow *win, Transform &t, float dt, int texCount);
 
 #endif
