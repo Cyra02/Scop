@@ -48,4 +48,17 @@ void input(GLFWwindow *win, Transform &t, float dt, int texCount)
     if(nDown && !t.nDown && texCount > 0)
         t.texIndex = (t.texIndex + 1) %texCount; // para dar la vuelta al llegar al final
     t.nDown = nDown;
+
+    bool spaceDown = (glfwGetKey(win, GLFW_KEY_SPACE) == GLFW_PRESS);
+    if(spaceDown && !t.spaceDown)
+        t.autorotate = !t.autorotate;
+    t.spaceDown = spaceDown;
+    if(t.autorotate)
+        t.rotY += 0.8f * dt;
+
+    bool fDown = (glfwGetKey(win, GLFW_KEY_F) == GLFW_PRESS);
+    if(fDown && !t.fDown)
+        t.wireFrame = !t.wireFrame; 
+    t.fDown = fDown;
+    
 }

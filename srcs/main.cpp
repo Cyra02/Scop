@@ -99,7 +99,7 @@ int main()
     std::vector<Vec3> objVertices;
     std::vector<unsigned int> objIndices;
 
-    if(!objLoad("resources/Craneo_3.obj", objVertices, objIndices))
+    if(!objLoad("resources/42.obj", objVertices, objIndices))
         return 1;
     
     // control de textura
@@ -182,7 +182,9 @@ int main()
     Vec3 centre = Vec3::centro(objVertices);
     std::cout << "centro: " << centre.x << " " << centre.y << " " << centre.z << std::endl;
 
+    
     Transform t = {};
+    t.autorotate = true; //empezar girando
     t.rotY = ToRadians(-90.0f);
     t.posZ = -8.0f;
     // rotado porque viene de lado el 42
@@ -238,7 +240,7 @@ int main()
         glUniformMatrix4fv(loc, 1, GL_FALSE, model.m);
 
         glBindVertexArray(vao);
-        //dibujar triangulo
+        glPolygonMode(GL_FRONT_AND_BACK, t.wireFrame ? GL_LINE : GL_FILL); // para on y off
         glDrawArrays(GL_TRIANGLES, 0, vertexCount);
         //glDrawElements(GL_TRIANGLES, objIndices.size(), GL_UNSIGNED_INT, 0);
         //para error del dibujado

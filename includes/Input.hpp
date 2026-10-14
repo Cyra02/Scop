@@ -12,6 +12,12 @@ struct Transform
     float posY;
     float posZ;
 
+    bool autorotate;
+    bool spaceDown;
+
+    bool wireFrame;
+    bool fDown;
+
     bool useTexture;
     bool tDown;
     int texIndex;
